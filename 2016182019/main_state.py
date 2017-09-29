@@ -4,16 +4,18 @@ import game_framework
 import random
 import title_state
 def enter():
-    global boy, grass
+    global team, grass,select
     open_canvas()
-    boy = Boy()
+    team = [Boy() for i in range(11)]
+    select = 0
     grass = Grass()
 def exit():
-    global boy, grass
-    del(boy)
+    global team, grass
+    del(team)
     del(grass)
     close_canvas()
 def handle_events():
+    global select
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
@@ -21,15 +23,39 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.change_state(title_state)
         elif event.type == SDL_MOUSEMOTION:
-            boy.x = event.x
-            boy.y =600-event.y
+            team[select].x,team[select].y = event.x,600-event.y
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_F1:
+            select = 0
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_F2:
+            select = 1
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_F3:
+            select = 2
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_F4:
+            select = 3
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_F5:
+            select = 4
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_F6:
+            select = 5
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_F7:
+            select = 6
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_F8:
+            select = 7
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_F9:
+            select = 8
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_F10:
+            select = 9
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_F11:
+            select = 10
 def update():
-    boy.update()
+    for boy in team:
+        boy.update()
+        boy.x+=2
     delay(0.05)
 def draw():
     clear_canvas()
     grass.draw()
-    boy.draw()
+    for boy in team:
+        boy.draw()
     update_canvas()
 class Grass:
     def __init__(self):
