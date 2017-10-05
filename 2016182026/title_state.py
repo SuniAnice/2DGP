@@ -1,6 +1,6 @@
 from pico2d import *
 import os
-os.chdir('c:\\Users\\Lenovo\\Desktop\\2D')
+os.chdir('c:\\Users\\lee\Desktop\\2D')
 import main_state
 import game_framework
 
