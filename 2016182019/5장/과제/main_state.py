@@ -1,19 +1,21 @@
 from pico2d import *
-import os
 import game_framework
 import random
 import title_state
 def enter():
     global team, grass,select,font
     open_canvas()
+    Boy.image = None
+    Grass.image = None
     team = [Boy() for i in range(1000)]
     select = 0
     grass = Grass()
-    font = load_font('Consola.ttf')
+    font = load_font('Consola.ttf',25)
 def exit():
-    global team, grass
+    global team, grass,font
     del(team)
     del(grass)
+    del(font)
     close_canvas()
 def handle_events():
     global select
@@ -44,8 +46,10 @@ def draw():
     font.draw(10,10,str(select),(0,0,255))
     update_canvas()
 class Grass:
+    image = None
     def __init__(self):
-        self.image = load_image('grass.png')
+        if Grass.image == None:
+            Grass.image = load_image('grass.png')
     def draw(self):
         self.image.draw(400, 30)
 class Boy:
@@ -99,20 +103,6 @@ class Boy:
         RIGHT_STAND: handle_right_stand
         }
     def update(self):
-        #if self.state == self.RIGHT_RUN:
-            #self.frame = (self.frame + 1) % 8
-            #self.x+=(self.dir*5)
-        #elif self.state == self.LEFT_RUN:
-            #self.frame = (self.frame + 1) % 8
-        #    self.x+=(self.dir*5)
-        #if self.x>800:
-        #    self.dir = -1
-        #    self.x = 800
-        #    self.state = self.LEFT_RUN
-        #elif self.x<0:
-        #    self.dir = 1
-        #    self.x = 0
-        #    self.state = self.RIGHT_RUN
         self.frame = (self.frame + 1) % 8
         self.handle_state[self.state](self)
     def draw(self):

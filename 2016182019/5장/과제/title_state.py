@@ -1,5 +1,4 @@
 from pico2d import *
-import os
 import game_framework
 import main_state
 name = "TitleState"
