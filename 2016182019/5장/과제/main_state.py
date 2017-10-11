@@ -4,11 +4,12 @@ import game_framework
 import random
 import title_state
 def enter():
-    global team, grass,select
+    global team, grass,select,font
     open_canvas()
-    team = [Boy() for i in range(11)]
+    team = [Boy() for i in range(1000)]
     select = 0
     grass = Grass()
+    font = load_font('Consola.ttf')
 def exit():
     global team, grass
     del(team)
@@ -24,38 +25,23 @@ def handle_events():
             game_framework.change_state(title_state)
         elif event.type == SDL_MOUSEMOTION:
             team[select].x,team[select].y = event.x,600-event.y
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_F1:
-            select = 0
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_F2:
-            select = 1
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_F3:
-            select = 2
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_F4:
-            select = 3
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_F5:
-            select = 4
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_F6:
-            select = 5
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_F7:
-            select = 6
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_F8:
-            select = 7
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_F9:
-            select = 8
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_F10:
-            select = 9
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_F11:
-            select = 10
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_DOWN:
+            if select < 1000:
+                select +=1
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_UP:
+            if select > 0:
+                select -=1
 def update():
     for boy in team:
         boy.update()
-        boy.x+=2
     delay(0.05)
 def draw():
+    global select
     clear_canvas()
     grass.draw()
     for boy in team:
         boy.draw()
+    font.draw(10,10,str(select),(0,0,255))
     update_canvas()
 class Grass:
     def __init__(self):
@@ -63,11 +49,71 @@ class Grass:
     def draw(self):
         self.image.draw(400, 30)
 class Boy:
+    image = None
+
+    LEFT_RUN,RIGHT_RUN,LEFT_STAND,RIGHT_STAND = 0,1,2,3
+
+    
+    
     def __init__(self):
         self.x, self.y = random.randint(100,700),90
         self.frame = random.randint(0, 7)
-        self.image = load_image('run_animation.png')
+        self.dir = 1
+        self.run_frames = random.randint(0,100)
+        self.stand_frames = 0
+        self.state = self.RIGHT_RUN
+        if Boy.image == None:
+            Boy.image = load_image('animation_sheet.png')
+    def handle_right_run(self):
+        self.x+=5
+        self.run_frames+=1
+        if self.x>800:
+            self.x = 800
+            self.state = self.LEFT_RUN
+        if self.run_frames == 100:
+            self.state = self.RIGHT_STAND
+            self.stand_frames = 0
+    def handle_right_stand(self):
+        self.stand_frames+=1
+        if self.stand_frames == 50:
+            self.state = self.RIGHT_RUN
+            self.run_frames = 0
+    def handle_left_run(self):
+        self.x-=5
+        self.run_frames+=1
+        if self.x<0:
+            self.x = 0
+            self.state = self.RIGHT_RUN
+        if self.run_frames == 100:
+            self.state = self.LEFT_STAND
+            self.stand_frames = 0
+    def handle_left_stand(self):
+        self.stand_frames+=1
+        if self.stand_frames == 50:
+            self.state = self.LEFT_RUN
+            self.run_frames = 0
+    handle_state = {
+        LEFT_RUN:handle_left_run,
+        RIGHT_RUN:handle_right_run,
+        LEFT_STAND: handle_left_stand,
+        RIGHT_STAND: handle_right_stand
+        }
     def update(self):
+        #if self.state == self.RIGHT_RUN:
+            #self.frame = (self.frame + 1) % 8
+            #self.x+=(self.dir*5)
+        #elif self.state == self.LEFT_RUN:
+            #self.frame = (self.frame + 1) % 8
+        #    self.x+=(self.dir*5)
+        #if self.x>800:
+        #    self.dir = -1
+        #    self.x = 800
+        #    self.state = self.LEFT_RUN
+        #elif self.x<0:
+        #    self.dir = 1
+        #    self.x = 0
+        #    self.state = self.RIGHT_RUN
         self.frame = (self.frame + 1) % 8
+        self.handle_state[self.state](self)
     def draw(self):
-        self.image.clip_draw(self.frame*100, 0, 100, 100, self.x, self.y)
+        self.image.clip_draw(self.frame*100, self.state*100, 100, 100, self.x, self.y)

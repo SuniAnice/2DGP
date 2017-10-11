@@ -1,6 +1,5 @@
 from pico2d import *
 import os
-os.chdir('E:\\2d플\\리소스')
 import game_framework
 import title_state
 name = "StartState"

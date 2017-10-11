@@ -2,7 +2,6 @@ from pico2d import *
 import os
 import game_framework
 import main_state
-os.chdir('E:\\2d플\\리소스')
 name = "TitleState"
 image = None
 def enter():
