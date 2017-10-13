@@ -2,12 +2,13 @@ from pico2d import *
 import game_framework
 import random
 import title_state
+import json_player
 def enter():
     global team, grass,select,font
     open_canvas()
     Boy.image = None
     Grass.image = None
-    team = [Boy() for i in range(1000)]
+    json_player.create_team()
     select = 0
     grass = Grass()
     font = load_font('Consola.ttf',25)
