@@ -1,0 +1,7 @@
+{
+"Tiffany":{"StartState":"LEFT_STAND","x":100,"y":100},
+"Tiffany2":{"StartState":"RIGHT_STAND","x":200,"y":200},
+"Tiffany3":{"StartState":"LEFT_STAND","x":300,"y":300},
+"Tiffany4":{"StartState":"LEFT_STAND","x":400,"y":300},
+"Tiffany5":{"StartState":"LEFT_STAND","x":400,"y":400}
+}

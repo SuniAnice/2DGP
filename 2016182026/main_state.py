@@ -1,9 +1,10 @@
 from pico2d import *
 import os
-os.chdir('c:\\Users\\Lenovo\\Desktop\\2D')
+os.chdir('c:\\Users\\lee\\Desktop\\2D')
 import title_state
 import game_framework
 import random
+import json_state
 class Boy:
     image= None
     LEFT_RUN,RIGHT_RUN,LEFT_STAND,RIGHT_STAND=0,1,2,3
@@ -77,13 +78,13 @@ def enter():
     z=0
     s=str(z)
     a=load_font('Consola.ttf',20)
-   
-
+    json_state.create_team()
 
 def exit():
     global boy,grass,team
     del(team)
     del(grass)
+
 
 def handle_events():
  global running
@@ -127,4 +128,6 @@ def draw():
         boy.draw()
     a.draw(100,50,s,(0,255,0))
     update_canvas()
-    
+
+
+
