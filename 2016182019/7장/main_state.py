@@ -8,7 +8,7 @@ def enter():
     open_canvas()
     Boy.image = None
     Grass.image = None
-    json_player.create_team()
+    team = json_player.create_team()
     select = 0
     grass = Grass()
     font = load_font('Consola.ttf',25)
@@ -19,24 +19,35 @@ def exit():
     del(font)
     close_canvas()
 def handle_events():
-    global select
+    global select,Boy
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.change_state(title_state)
-        elif event.type == SDL_MOUSEMOTION:
-            team[select].x,team[select].y = event.x,600-event.y
+        #elif event.type == SDL_MOUSEMOTION:
+        #    team[select].x,team[select].y = event.x,600-event.y
         elif event.type == SDL_KEYDOWN and event.key == SDLK_DOWN:
-            if select < 1000:
+            if select < 4:
                 select +=1
         elif event.type == SDL_KEYDOWN and event.key == SDLK_UP:
             if select > 0:
                 select -=1
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_LEFT:
+            team[select].state = Boy.LEFT_RUN
+        elif event.type == SDL_KEYUP and event.key == SDLK_LEFT and team[select].state == Boy.LEFT_RUN:
+            team[select].state = Boy.LEFT_STAND
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_RIGHT:
+            team[select].state = Boy.RIGHT_RUN
+        elif event.type == SDL_KEYUP and event.key == SDLK_RIGHT and team[select].state == Boy.RIGHT_RUN:
+            team[select].state = Boy.RIGHT_STAND
 def update():
     for boy in team:
-        boy.update()
+        if (boy.name == team[select].name):
+            boy.updatehero()
+        else:
+            boy.update()
     delay(0.05)
 def draw():
     global select
@@ -44,7 +55,7 @@ def draw():
     grass.draw()
     for boy in team:
         boy.draw()
-    font.draw(10,10,str(select),(0,0,255))
+    font.draw(10,10,str(team[select].name),(0,0,255))
     update_canvas()
 class Grass:
     image = None
@@ -58,8 +69,6 @@ class Boy:
 
     LEFT_RUN,RIGHT_RUN,LEFT_STAND,RIGHT_STAND = 0,1,2,3
 
-    
-    
     def __init__(self):
         self.x, self.y = random.randint(100,700),90
         self.frame = random.randint(0, 7)
@@ -69,6 +78,7 @@ class Boy:
         self.state = self.RIGHT_RUN
         if Boy.image == None:
             Boy.image = load_image('animation_sheet.png')
+    
     def handle_right_run(self):
         self.x+=5
         self.run_frames+=1
@@ -97,14 +107,24 @@ class Boy:
         if self.stand_frames == 50:
             self.state = self.LEFT_RUN
             self.run_frames = 0
+            
+
+
     handle_state = {
         LEFT_RUN:handle_left_run,
         RIGHT_RUN:handle_right_run,
         LEFT_STAND: handle_left_stand,
         RIGHT_STAND: handle_right_stand
         }
+    
     def update(self):
         self.frame = (self.frame + 1) % 8
         self.handle_state[self.state](self)
+    def updatehero(self):
+        self.frame = (self.frame+1)%8
+        if self.state == self.RIGHT_RUN:
+            self.x = min(800, self.x + 5)
+        elif self.state == self.LEFT_RUN:
+            self.x = max(0,self.x-5)
     def draw(self):
         self.image.clip_draw(self.frame*100, self.state*100, 100, 100, self.x, self.y)
