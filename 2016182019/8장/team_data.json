@@ -1,0 +1,8 @@
+{
+	"Minsu" : {"StartState" : "LEFT_STAND", "x" : 500,"y" : 400},
+	"Jinsu" : {"StartState" : "LEFT_RUN", "x" : 200,"y" : 300},
+	"Gwangsung" : {"StartState" : "RIGHT_RUN", "x" : 400,"y" : 200},
+	"Youngjun" : {"StartState" : "RIGHT_STAND", "x" : 100,"y" : 300},
+	"Joungsu" : {"StartState" : "LEFT_RUN", "x" : 120,"y" : 400},
+	"Youngju" : {"StartState" : "RIGHT_RUN", "x" : 320,"y" : 350}
+}
