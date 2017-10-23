@@ -7,6 +7,14 @@ import random
 import json_state
 class Boy:
     image= None
+    PIXEL_PER_METER=(10.0/0.3)#10pixel30
+    RUN_SPEED_KMPH=20.0#km/hour
+    RUN_SPEED_MPM=(RUN_SPEED_KMPH*1000.0/60.)
+    RUN_SPEED_MPS=(RUN_SPEED_MPM/60.0)
+    RUN_SPEED_PPS=(RUN_SPEED_MPS*PIXEL_PER_METER)
+    TIMER_PER_ACTION=0.5
+    ACTION_PER_TIME=1.0/TIMER_PER_ACTION
+    FRAMES_PER_ACTION=8
     LEFT_RUN,RIGHT_RUN,LEFT_STAND,RIGHT_STAND=0,1,2,3
     def __init__(self):
         self.x,self.y=random.randint(100,700),90
@@ -14,18 +22,19 @@ class Boy:
         self.dir=1
         self.run_frames=0
         self.stand_frames=0
+        self.total_frames=0
         self.state=random.randint(2,3)
         if Boy.image==None:
             Boy.image=load_image('animation_sheet.png')
     def handle_left_run(self):
-        self.x-=5
+        self.x-=(self.dir*distance)
         self.run_frames+=1
         if self.x<0:
             self.x=0
     def handle_left_stand(self):
         self.stand_frames+=1
     def handle_right_run(self):
-        self.x+=5
+        self.x+=(self.dir*distance)
         self.run_frames+=1
         if self.x>800:
             self.x=800
@@ -52,9 +61,12 @@ class Boy:
             LEFT_STAND:handle_left_stand,
             RIGHT_STAND:handle_right_stand
     }
-    def update(self):
-            self.frame=(self.frame+1)%8
+    def update(self,frame_time):
+        distance=Boy.RUN_SPEED_PPS*frame_time
+        self.total_frames+=Boy.FRAMES_PER_ACTION*BOY_ACTION_PER_TIME*frame_time
+            self.frame=int(self.total_frames)%8
             self.handle_state[self.state](self)
+            print("Change Time:  %f, Total Frames:  %d" %(get_time(),self.total_frames))
             if self.state==self.RIGHT_RUN:
                 self.x=min(800,self.x+5)
             elif self.state==self.LEFT_RUN:
