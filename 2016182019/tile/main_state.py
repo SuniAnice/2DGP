@@ -2,40 +2,85 @@ from pico2d import *
 import game_framework
 import random
 import time
+import json
 import title_state
 import json_player
+import background
+
+canvasWidth = 480
+canvasHeight = 272
+
+class TileBackground:
+    def __init__(self,filename):
+        f = open('map.json')
+        self.map = json.load(f)
+        self.x = 0
+        self.y = 0
+    def draw(self):
+        tile_per_line = self.map['width']
+        data = self.map['layers'][0]['data']
+        tileset = self.map['tilesets'][0]
+        tile_width = tileset['tilewidth']
+        tile_height = tileset['tileheight']
+        margin = tileset['margin']
+        spacing = tileset['spacing']
+        columns = tileset['columns']
+        dx,dy = 0,0
+        desty = dy
+        for y in range(5):
+            destx = dx
+            for x in range(10):
+                index = y * tile_per_line + x
+                tile = data[index]
+                tx = tile % columns
+                ty = tile // columns
+                srcx = margin + tx * (tile_width + spacing)
+                srcy = margin + ty * (tile_height + spacing)
+
+                destx+=tile_width
+
+                
+            desty +=tile_height
 def enter():
-    global team, grass,select,font,frame_time
-    open_canvas(sync = True)
+    global team, grass,select,font,frame_time,maxplayer,back
+    open_canvas()
     Boy.image = None
     Grass.image = None
+    background.Background.image = None
     frame_time = 0.01
-    team = json_player.create_team()
+    team,maxplayer = json_player.create_team()
     select = 0
     grass = Grass()
+    back = background.Background()
     font = load_font('Consola.ttf',25)
 def exit():
-    global team, grass,font
-    del(team)
+    global team, grass,font,back
     del(grass)
     del(font)
+    del(team)
+    del(back)
     close_canvas()
 def handle_events():
-    global select,Boy
+    global select,Boy,maxplayer
     events = get_events()
     for event in events:
+        back.handle_events(event)
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-            game_framework.change_state(title_state)
+            game_framework.quit()
         #elif event.type == SDL_MOUSEMOTION:
         #    team[select].x,team[select].y = event.x,600-event.y
         elif event.type == SDL_KEYDOWN and event.key == SDLK_DOWN:
-            if select < 4:
+            if select < maxplayer-1:
                 select +=1
+            else:
+                select = 0
         elif event.type == SDL_KEYDOWN and event.key == SDLK_UP:
             if select > 0:
                 select -=1
+            else:
+                select = maxplayer - 1
         elif event.type == SDL_KEYDOWN and event.key == SDLK_LEFT:
             team[select].state = Boy.LEFT_RUN
         elif event.type == SDL_KEYUP and event.key == SDLK_LEFT and team[select].state == Boy.LEFT_RUN:
@@ -45,26 +90,30 @@ def handle_events():
         elif event.type == SDL_KEYUP and event.key == SDLK_RIGHT and team[select].state == Boy.RIGHT_RUN:
             team[select].state = Boy.RIGHT_STAND
 def update():
-    global frame_time
+    pass
+  
+    
+def draw():
+    global select,frame_time
+    current_time = get_time()
+
     handle_events()
     for boy in team:
         if (boy.name == team[select].name):
             boy.updatehero(frame_time)
         else:
             boy.update(frame_time)
-    delay(0.02)
-def draw():
-    global select,frame_time
-    current_time = get_time()
-    
+    #back.update(frame_time)
+    #delay(0.01)
     clear_canvas()
     grass.draw()
+    #back.draw()
     for boy in team:
         boy.draw()
     font.draw(10,10,str(team[select].name),(0,0,255))
     update_canvas()
 
-    frame_time = get_time() - current_time+0.01
+    frame_time = get_time() - current_time
     frame_rate = 1.0/frame_time
 
     current_time += frame_time
@@ -82,7 +131,7 @@ class Boy:
     
 
     PIXEL_PER_METER = 10.0/0.3
-    RUN_SPEED_KMPH = 30.0
+    RUN_SPEED_KMPH = 20.0
     RUN_SPEED_MPM = RUN_SPEED_KMPH*1000/60.0
     RUN_SPEED_MPS = RUN_SPEED_MPM/60.0
     RUN_SPEED_PPS = RUN_SPEED_MPS * PIXEL_PER_METER
@@ -113,12 +162,12 @@ class Boy:
         if self.x>800:
             self.x = 800
             self.state = self.LEFT_RUN
-        if self.run_frames == 100:
+        if self.run_frames >= 100:
             self.state = self.RIGHT_STAND
             self.stand_frames = 0
     def handle_right_stand(self,distance):
         self.stand_frames+=1
-        if self.stand_frames == 50:
+        if self.stand_frames >= 50:
             self.state = self.RIGHT_RUN
             self.run_frames = 0
     def handle_left_run(self,distance):
@@ -127,12 +176,12 @@ class Boy:
         if self.x<0:
             self.x = 0
             self.state = self.RIGHT_RUN
-        if self.run_frames == 100:
+        if self.run_frames >= 100:
             self.state = self.LEFT_STAND
             self.stand_frames = 0
     def handle_left_stand(self,distance):
         self.stand_frames+=1
-        if self.stand_frames == 50:
+        if self.stand_frames >= 50:
             self.state = self.LEFT_RUN
             self.run_frames = 0
             
