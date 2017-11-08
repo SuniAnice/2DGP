@@ -7,17 +7,61 @@ import title_state
 import json_player
 import background
 
-canvasWidth = 480
-canvasHeight = 272
+name = 'Main_state'
 
+canvasWidth = 800
+canvasHeight = 600
+SCROLL_SPEED_PPS = 300
 class TileBackground:
-    def __init__(self,filename):
+    
+    def __init__(self,fliename,width,height):
         f = open('map.json')
         self.map = json.load(f)
         self.x = 0
         self.y = 0
+        self.speedx = 0
+        self.speedy = 0
+        self.canvasWidth = width
+        self.canvasHeight = height
+        image_filename = self.map['tilesets'][0]['image']
+        self.image = load_image('tmw_desert_spacing.png')
+    def update(self):
+        global frame_time,tile_width
+        if ((self.x + self.speedx * frame_time) < 0):
+            self.x = 0
+        elif (self.x + self.speedx * frame_time > 2000):
+            self.x = 2000
+        else:
+            self.x+=self.speedx * frame_time
+        if ((self.y + self.speedy * frame_time) < 0):
+            self.y = 0
+        elif (self.y + self.speedy * frame_time > 2000):
+            self.y = 2000
+        else:
+            self.y+=self.speedy * frame_time
+    def handle_events(self,event):
+        if event.type == SDL_KEYDOWN and event.key == SDLK_LEFT:
+            self.speedx = - SCROLL_SPEED_PPS
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_RIGHT:
+            self.speedx =SCROLL_SPEED_PPS
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_UP:
+            self.speedy =SCROLL_SPEED_PPS
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_DOWN:
+            self.speedy =-SCROLL_SPEED_PPS
+
+        if event.type == SDL_KEYUP and event.key == SDLK_LEFT:
+            self.speedx = 0
+        elif event.type == SDL_KEYUP and event.key == SDLK_RIGHT:
+            self.speedx =0
+        elif event.type == SDL_KEYUP and event.key == SDLK_UP:
+            self.speedy =0
+        elif event.type == SDL_KEYUP and event.key == SDLK_DOWN:
+            self.speedy =0
+        
     def draw(self):
-        tile_per_line = self.map['width']
+        global tile_width
+        map_width = self.map['width']
+        map_height = self.map['height']
         data = self.map['layers'][0]['data']
         tileset = self.map['tilesets'][0]
         tile_width = tileset['tilewidth']
@@ -25,25 +69,35 @@ class TileBackground:
         margin = tileset['margin']
         spacing = tileset['spacing']
         columns = tileset['columns']
-        dx,dy = 0,0
-        desty = dy
-        for y in range(5):
-            destx = dx
-            for x in range(10):
-                index = y * tile_per_line + x
+        rows = - (-tileset['tilecount'] // columns)
+
+        startx = tile_width // 2 - self.x % tile_width
+        starty = tile_height // 2 - self.y % tile_height
+
+        endx = self.canvasWidth + tile_width // 2
+        endy = self.canvasHeight + tile_height // 2
+        
+        desty = starty
+        my = int(self.y // tile_height)
+        while(desty<endy):
+            destx = startx
+            mx = int(self.x // tile_width)
+            while(destx<endx):
+                index = (map_height-my-1) * map_width + mx
                 tile = data[index]
-                tx = tile % columns
-                ty = tile // columns
+                tx = (tile-1) % columns
+                ty = rows - (tile - 1) // columns - 1
                 srcx = margin + tx * (tile_width + spacing)
                 srcy = margin + ty * (tile_height + spacing)
-
+                self.image.clip_draw(srcx,srcy,tile_width,tile_height,destx,desty)
                 destx+=tile_width
-
+                mx+=1
                 
             desty +=tile_height
+            my+=1
 def enter():
     global team, grass,select,font,frame_time,maxplayer,back
-    open_canvas()
+    open_canvas(canvasWidth,canvasHeight)
     Boy.image = None
     Grass.image = None
     background.Background.image = None
@@ -51,7 +105,7 @@ def enter():
     team,maxplayer = json_player.create_team()
     select = 0
     grass = Grass()
-    back = background.Background()
+    back = TileBackground('map.json',canvasWidth,canvasHeight)
     font = load_font('Consola.ttf',25)
 def exit():
     global team, grass,font,back
@@ -61,9 +115,10 @@ def exit():
     del(back)
     close_canvas()
 def handle_events():
-    global select,Boy,maxplayer
+    global select,Boy,maxplayer,back
     events = get_events()
     for event in events:
+        #back.handle_events(event)
         back.handle_events(event)
         if event.type == SDL_QUIT:
             game_framework.quit()
@@ -103,11 +158,11 @@ def draw():
             boy.updatehero(frame_time)
         else:
             boy.update(frame_time)
-    #back.update(frame_time)
-    #delay(0.01)
+    back.update()
+    delay(0.01)
     clear_canvas()
     grass.draw()
-    #back.draw()
+    back.draw()
     for boy in team:
         boy.draw()
     font.draw(10,10,str(team[select].name),(0,0,255))
