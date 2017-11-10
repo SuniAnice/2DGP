@@ -25,7 +25,7 @@ def exit():
     del(left_arrow)
     del(right_arrow)
     close_canvas()
-def handle_events():
+def handle_events(frame_time):
     global select
     events = get_events()
     for event in events:
@@ -46,9 +46,9 @@ def handle_events():
                     select-=1
             elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
                 pass
-def update():
-    delay(0.01)
-def draw():
+def update(frame_time):
+    pass
+def draw(frame_time):
     global select
     clear_canvas()
     default.draw(400,300)

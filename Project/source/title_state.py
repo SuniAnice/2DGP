@@ -13,7 +13,7 @@ def exit():
     global image
     del(image)
     close_canvas()
-def handle_events():
+def handle_events(frame_time):
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
@@ -23,9 +23,9 @@ def handle_events():
                 game_framework.quit()
             elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
                 game_framework.change_state(select_state)
-def update():
-    delay(0.01)
-def draw():
+def update(frame_time):
+    pass
+def draw(frame_time):
     clear_canvas()
     image.draw(400, 300)
     update_canvas()
