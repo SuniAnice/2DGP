@@ -4,25 +4,7 @@ import random
 import time
 import json
 import json_player
-
-name = 'Main_state'
-
-canvasWidth = 800
-canvasHeight = 600
-SCROLL_SPEED_PPS = 300
-class TileBackground:
-    
-    def __init__(self,fliename,width,height):
-        f = open('map.json')
-        self.map = json.load(f)
-        self.x = 0
-        self.y = 0
-        self.speedx = 0
-        self.speedy = 0
-        self.canvasWidth = width
-        self.canvasHeight = height
-        image_filename = self.map['tilesets'][0]['image']
-        self.image = load_image('tmw_desert_spacing.png')
+'''
     def update(self):
         global frame_time,tile_width
         if ((self.x + self.speedx * frame_time) < 0):
@@ -37,6 +19,38 @@ class TileBackground:
             self.y = 2000
         else:
             self.y+=self.speedy * frame_time
+'''
+name = 'Main_state'
+
+canvasWidth = 800
+canvasHeight = 600
+SCROLL_SPEED_PPS = 300
+class TileBackground:
+    
+    def __init__(self,fliename,width,height):
+        f = open('map.json')
+        self.map = json.load(f)
+        tileset = self.map['tilesets'][0]
+        self.x = 0
+        self.y = 0
+        self.layerindex = 0
+        self.speedx = 0
+        self.speedy = 0
+        self.canvasWidth = width
+        self.canvasHeight = height
+        self.w = tileset['tilewidth'] * self.map['width']
+        self.h = tileset['tileheight'] * self.map['height']
+        image_filename = tileset['image']
+        self.image = load_image('tmw_desert_spacing.png')
+
+    def set_center_object(self, boy):
+        self.center_object = boy
+    def update(self):
+        self.window_left = clamp(0,int(self.center_object.x) - self.canvasWidth//2,
+                                 self.w-self.canvasWidth)
+        self.window_bottom = clamp(0,
+                                   int(self.center_object.y)-self.canvasHeight//2,
+                                  self.h - self.canvasHeight)
     def handle_events(self,event):
         if event.type == SDL_KEYDOWN and event.key == SDLK_LEFT:
             self.speedx = - SCROLL_SPEED_PPS
@@ -155,6 +169,7 @@ def draw():
             boy.updatehero(frame_time)
         else:
             boy.update(frame_time)
+    back.set_center_object(team[select])
     back.update()
     delay(0.01)
     clear_canvas()
@@ -183,7 +198,7 @@ class Boy:
     
 
     PIXEL_PER_METER = 10.0/0.3
-    RUN_SPEED_KMPH = 20.0
+    RUN_SPEED_KMPH = 40.0
     RUN_SPEED_MPM = RUN_SPEED_KMPH*1000/60.0
     RUN_SPEED_MPS = RUN_SPEED_MPM/60.0
     RUN_SPEED_PPS = RUN_SPEED_MPS * PIXEL_PER_METER
