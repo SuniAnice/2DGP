@@ -3,9 +3,7 @@ import game_framework
 import random
 import time
 import json
-import title_state
 import json_player
-import background
 
 name = 'Main_state'
 
@@ -100,7 +98,6 @@ def enter():
     open_canvas(canvasWidth,canvasHeight)
     Boy.image = None
     Grass.image = None
-    background.Background.image = None
     frame_time = 0.01
     team,maxplayer = json_player.create_team()
     select = 0
