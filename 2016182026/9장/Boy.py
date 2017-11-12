@@ -21,6 +21,8 @@ class TileBackground:
         self.y=0
         self.speedX=0
         self.speedY=0
+        image_filename=self.map['tilesets'][0]['image']
+        self.image=load_image('tmw_desert_spacing.png')
     def draw(self):
         map_width=self.map['width']
         map_height=self.map['height']
@@ -50,16 +52,34 @@ class TileBackground:
                 srcy=self.image.h-margin+ty*(tile_height+spacing)
                 self.image.clip.draw(srcx,srcy,tile_width,tile_height,destx,desty)
                 destx+=tile_width
+                mx+=1
                 print(x,y,index,tile,srcx,srcy,destx,desty)
             desty+=tile_heght
-    def update(self,frametime):
-        self.left=(self.left+frame_time*self.speed)%self.image.w
+            my+=1
+    def update(self,frame_time):
+        global map_width,map_height
+        if((self.x+self.speedx*frametime)<0):
+            self.x=0
+        elif (self.x+self.speedx*frametime>map_width):
+            self.x=map_width
+        else:
+            self.x+=self.speedx*frametime
+        if ((self.y+self.speedy*frametime)<0):
+            self.y=0
+        elif (self.y+self.speedy*frame_time>map_height):
+            self.y=map_height
+        else:
+            self.y+=self.speedy*frametime
     def handle_event(self,event):
         if event.type==SDL_KEYDOWN:
             if event.key==SDLK_LEFT:
-                self.speed-=TileBackground.SCROLL_SPEED_PPS
+                self.speedx-=TileBackground.SCROLL_SPEED_PPS
             elif event.key==SDLK_RIGHT:
-                self.speed+=TileBackground.SCROLL_SPEED_PPS
+                self.speedx+=TileBackground.SCROLL_SPEED_PPS
+            elif event.key==SDLK_UP:
+                self.speedy+=TileBackground.SCROLL_SPEED_PPS
+            elif event.key==SDLK_DOWN:
+                self.speedy-=TileBackground.SCROLL_SPEED_PPS
         if event.type==SDL_KEYUP:
             if event.key==SDLK_LEFT:
                 self.speed+=TileBackground.SCROLL_SPEED_PPS
@@ -228,7 +248,7 @@ class Background:
                 self.speed-=Background.SCROLL_SPEED_PPS
 
 def enter():
-    global team,grass,z,s,a,frame_time,balls,big_balls,background,TILE
+    global team,grass,z,s,a,frame_time,balls,big_balls,TILE
     team=[Boy() for i in range(11)]
     TILE=TileBackground('map.json',250,250)
     grass=Grass()
@@ -239,7 +259,6 @@ def enter():
     frame_time=0.1
     balls=[Ball()for i in range(10)]
     balls=big_balls+balls
-    background=Background(960,700)
 
 def exit():
     global boy,grass,team,balls
@@ -271,10 +290,10 @@ def handle_events():
             running=False
        else :
             team[z].handle_event(event)
-            background.handle_event(event)
+            TILE.handle_event(event)
   elif event.type==SDL_KEYUP:
       team[z].handle_event(event)
-      background.handle_event(event)
+      TILE.handle_event(event)
   elif event.type==SDL_MOUSEMOTION: 
        team[z].x,team[z].y=event.x,600-event.y
 
@@ -291,7 +310,7 @@ def update():
     for ball in big_balls:
         if collide(grass,ball):
             ball.stop()
-    background.update(frame_time)
+    TILE.update(frame_time)
 
 def collide(a,b):
     left_a,bottom_a,right_a,top_a=a.get_bb()
@@ -310,7 +329,6 @@ def draw():
     current_time=get_time()
     clear_canvas()
     grass.draw()
-    background.draw()
     for boy in team:
         boy.draw()
     for ball in balls:
