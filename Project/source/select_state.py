@@ -22,7 +22,7 @@ def enter():
 def exit():
     global default,left_arrow,right_arrow,Screen
     del(default)
-    del(Screen)
+    #del(Screen)
     del(left_arrow)
     del(right_arrow)
     close_canvas()
@@ -65,8 +65,8 @@ def draw(frame_time):
     update_canvas()
 
 class gamescreen:
-    screen = []
     def __init__(self):
+        self.screen = []
         self.screen.append(load_image('necrodancer.png'))
         self.screen.append(load_image('Kirby Select Scene.png'))
         self.screen.append(load_image('Mario Select Scene.png'))

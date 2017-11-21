@@ -71,8 +71,8 @@ def pop_state():
         stack.pop()
 
     # execute resume function of the previous state
-    if (len(stack) > 0):
-        stack[-1].resume()
+    #if (len(stack) > 0):
+    #    stack[-1].resume()
 
 
 

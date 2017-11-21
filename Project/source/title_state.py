@@ -7,15 +7,17 @@ name = "TitleState"
 image = None
 bgm = None
 def enter():
-    global image,bgm
+    global image,bgm,image2
     open_canvas()
     image = load_image('title.png')
+    image2 = load_image('title_text.png')
     bgm = load_music('../bgm/title.mp3')
     bgm.set_volume(64)
     bgm.repeat_play()
 def exit():
-    global image
+    global image,image2
     del(image)
+    del(image2)
     close_canvas()
 def handle_events(frame_time):
     events = get_events()
@@ -32,5 +34,6 @@ def update(frame_time):
 def draw(frame_time):
     clear_canvas()
     image.draw(400, 300)
+    image2.draw(430,430)
     update_canvas()
 
