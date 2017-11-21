@@ -7,7 +7,7 @@ os.chdir('../image')
 name = "SelectState"
 bgm = None
 def enter():
-    global default,left_arrow,right_arrow,select,rotate_sound,bgm,Screen
+    global default,left_arrow,right_arrow,select,rotate_sound,bgm,Screen,high
     open_canvas()
     select = 0
     Screen = gamescreen()
@@ -15,6 +15,7 @@ def enter():
     left_arrow = load_image('Arrow-To-Left_icon.png')
     right_arrow = load_image('Arrow-To-icon.png')
     bgm = load_music('../bgm/select_screen.mp3')
+    high = load_image('HighScore.png')
     bgm.set_volume(64)
     bgm.repeat_play()
     rotate_sound = load_wav('../bgm/rotate.wav')
@@ -58,6 +59,8 @@ def draw(frame_time):
 
     Screen.draw()
 
+    high.draw(300,55 )
+
     left_arrow.draw(70,300)
     right_arrow.draw(730,300)
         
@@ -72,10 +75,18 @@ class gamescreen:
         self.screen.append(load_image('Mario Select Scene.png'))
         self.screen.append(load_image('Overwatch Select Scene.png'))
         self.screen.append(load_image('Rhythm Select Scene.png'))
+        self.title = []
+        self.title.append(load_image('tutorial-3d-logo.png'))
+        self.title.append(load_image('Kirbys_Adventure_Logo.png'))
+        self.title.append(load_image('mariotitle.png'))
+        self.title.append(load_image('game-logo-overwatch.png'))
+        self.title.append(load_image('rhythmtitle.png'))
     def draw(self):
         global select
         image = self.screen[select]
+        image2 = self.title[select]
         image.draw(400,300)
+        image2.draw(400,500)
     def handle_event(self):
         global select
         if select == 0:
