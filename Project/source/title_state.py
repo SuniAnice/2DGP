@@ -5,10 +5,14 @@ import os
 os.chdir('../image')
 name = "TitleState"
 image = None
+bgm = None
 def enter():
-    global image
+    global image,bgm
     open_canvas()
     image = load_image('title.png')
+    bgm = load_music('../bgm/title.mp3')
+    bgm.set_volume(64)
+    bgm.repeat_play()
 def exit():
     global image
     del(image)
