@@ -59,7 +59,7 @@ def draw(frame_time):
 
     Screen.draw()
 
-    high.draw(300,55 )
+    high.draw(300,55)
 
     left_arrow.draw(70,300)
     right_arrow.draw(730,300)
@@ -91,3 +91,7 @@ class gamescreen:
         global select
         if select == 0:
             game_framework.change_state(game0_tutorial)
+
+class Arrows:
+    def __init__(self):
+        pass
