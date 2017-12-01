@@ -8,12 +8,12 @@ name = "SelectState"
 bgm = None
 def enter():
     global default,left_arrow,right_arrow,select,rotate_sound,bgm,Screen,high
-    open_canvas()
+    open_canvas(sync = True)
     select = 0
     Screen = gamescreen()
     default = load_image('whitescreen.png')
-    left_arrow = load_image('Arrow-To-Left_icon.png')
-    right_arrow = load_image('Arrow-To-icon.png')
+    left_arrow = LArrow()
+    right_arrow = RArrow()
     bgm = load_music('../bgm/select_screen.mp3')
     high = load_image('HighScore.png')
     bgm.set_volume(64)
@@ -42,16 +42,20 @@ def handle_events(frame_time):
                 else:
                     select+=1
                 rotate_sound.play()
+                right_arrow.SetRed()
             elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_LEFT):
                 if select == 0:
                     select = 4
                 else:
                     select-=1
                 rotate_sound.play()
+                left_arrow.SetRed()
+                
             elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
                 Screen.handle_event()
 def update(frame_time):
-    pass
+    left_arrow.update()
+    right_arrow.update()
 def draw(frame_time):
     global select
     clear_canvas()
@@ -61,8 +65,8 @@ def draw(frame_time):
 
     high.draw(300,55)
 
-    left_arrow.draw(70,300)
-    right_arrow.draw(730,300)
+    left_arrow.draw()
+    right_arrow.draw()
         
     
     update_canvas()
@@ -74,7 +78,7 @@ class gamescreen:
         self.screen.append(load_image('Kirby Select Scene.png'))
         self.screen.append(load_image('Mario Select Scene.png'))
         self.screen.append(load_image('Overwatch Select Scene.png'))
-        self.screen.append(load_image('Rhythm Select Scene.png'))
+        self.screen.append(load_image('rhythm_icon.png'))
         self.title = []
         self.title.append(load_image('tutorial-3d-logo.png'))
         self.title.append(load_image('Kirbys_Adventure_Logo.png'))
@@ -92,6 +96,45 @@ class gamescreen:
         if select == 0:
             game_framework.change_state(game0_tutorial)
 
-class Arrows:
+class LArrow:
     def __init__(self):
-        pass
+        self.image = load_image('Arrow-To-Left_icon.png')
+        self.simage = load_image('Arrow-To-Left_icon_Red.png')
+        self.frame = 0
+        self.redflag = False
+    def draw(self):
+        if (self.redflag):
+            self.simage.draw(70,300)
+        else:
+            self.image.draw(70,300)
+    def update(self):
+        if (self.redflag):
+            self.frame+=1
+            if (self.frame == 20):
+                self.frame = 0
+                self.redflag = False
+    def SetRed(self):
+        self.redflag = True
+        self.frame = 0
+
+class RArrow:
+    def __init__(self):
+        self.image = load_image('Arrow-To-icon.png')
+        self.simage = load_image('Arrow-To-icon_Red.png')
+        self.frame = 0
+        self.redflag = False
+    def draw(self):
+        if (self.redflag):
+            self.simage.draw(730,300)
+        else:
+            self.image.draw(730,300)
+    def update(self):
+        if (self.redflag):
+            self.frame+=1
+            if (self.frame == 20):
+                self.frame = 0
+                self.redflag = False
+    def SetRed(self):
+        self.redflag = True
+        self.frame = 0
+            
