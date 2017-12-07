@@ -32,7 +32,7 @@ def enter():
 
     map = load_image('necrodancer_map.png')
 
-    hero = load_image('cadence.png')
+    hero = Hero()
 
     mob = skeleton()
 
@@ -71,6 +71,7 @@ def update(frame_time):
         nots.update(frame_time)
 
     mob.update(frame_time)
+    hero.update(frame_time)
 
 
 
@@ -84,7 +85,7 @@ def draw(frame_time):
         nots.draw(frame_time)
 
 
-    hero.draw(320,300)
+    hero.draw(frame_time)
 
 
     mob.draw(frame_time)
@@ -106,6 +107,21 @@ class skeleton:
         self.frame = int(self.total_frames) % 15
     def draw(self,frame_time):
         self.image.clip_draw(self.frame * 96 ,0,100,100,500,300)
+
+class Hero:
+    TIME_PER_ACTION = 1
+    ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+    FRAMES_PER_ACTION = 8
+    def __init__(self):
+        self.image = load_image('necrodancer_sprite.png')
+        self.frame = 0
+        self.total_frames = 0
+    def update(self,frame_time):
+        global notes
+        self.total_frames += Hero.FRAMES_PER_ACTION * Hero.ACTION_PER_TIME * frame_time
+        self.frame = int(self.total_frames) % 4
+    def draw(self,frame_time):
+        self.image.clip_draw(self.frame * 100 ,0,100,100,320,300)
 
 class note:
     def __init__(self):
