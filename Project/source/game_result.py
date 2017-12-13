@@ -8,9 +8,6 @@ os.chdir('../image')
 name = "result"
 string = ""
 
-
-
-
 def savescore(gamecode,score):
     global result
     result = score
@@ -42,9 +39,6 @@ def savescore(gamecode,score):
             json.dump(scores,f)
             f.close()
 
-
-
-
 def enter():
     global bgm,sound,total_time,screen,bgm_isplay,result_img,sound,sound_isplay,font
     open_canvas()
@@ -69,16 +63,6 @@ def enter():
         sound = load_wav('../bgm/failed.wav')
         sound.set_volume(32)
 
-
-
-
-
-
-
-
-
-
-
 def exit():
     global bgm,screen,sound
     bgm.stop()
@@ -87,8 +71,6 @@ def exit():
     del(sound)
 
     close_canvas()
-
-
 
 def handle_events(frame_time):
     global total_time
@@ -108,12 +90,6 @@ def update(frame_time):
         bgm_isplay = True
 
 
-
-
-
-
-
-
 def draw(frame_time):
     global total_time,sound_isplay,result
     clear_canvas()
@@ -125,16 +101,10 @@ def draw(frame_time):
 
     if (total_time > 2.5):
         result_img.draw(400,300)
-
         font.draw(350,80,string,(0,0,255))
         if sound_isplay == False:
             sound.play()
             sound_isplay = True
-
-
-
-
-
 
     update_canvas()
 
