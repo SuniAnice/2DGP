@@ -2,6 +2,7 @@ from pico2d import *
 import game_framework
 import title_state
 import game0_tutorial
+import game1_kirby
 import os
 os.chdir('../image')
 name = "SelectState"
@@ -21,9 +22,11 @@ def enter():
     rotate_sound = load_wav('../bgm/rotate.wav')
     rotate_sound.set_volume(48)
 def exit():
-    global default,left_arrow,right_arrow,Screen
+    global default,left_arrow,right_arrow,Screen,bgm
+    bgm.stop()
+    del(bgm)
     del(default)
-    #del(Screen)
+    del(Screen)
     del(left_arrow)
     del(right_arrow)
     close_canvas()
@@ -63,7 +66,8 @@ def draw(frame_time):
 
     Screen.draw()
 
-    high.draw(300,55)
+    if select!=0:
+        high.draw(300,55)
 
     left_arrow.draw()
     right_arrow.draw()
@@ -95,6 +99,8 @@ class gamescreen:
         global select
         if select == 0:
             game_framework.change_state(game0_tutorial)
+        elif select == 1:
+            game_framework.change_state(game1_kirby)
 
 class LArrow:
     def __init__(self):

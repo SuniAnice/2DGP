@@ -15,7 +15,9 @@ def enter():
     bgm.set_volume(64)
     bgm.repeat_play()
 def exit():
-    global image,image2
+    global image,image2,bgm
+    bgm.stop()
+    del(bgm)
     del(image)
     del(image2)
     close_canvas()
@@ -34,6 +36,6 @@ def update(frame_time):
 def draw(frame_time):
     clear_canvas()
     image.draw(400, 300)
-    image2.draw(430,430)
+    #image2.draw(430,430)
     update_canvas()
 

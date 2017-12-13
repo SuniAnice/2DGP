@@ -3,20 +3,21 @@ import game_framework
 import os
 import threading
 import select_state
+import game_result
 os.chdir('../image')
-name = "Tutorial"
+name = "Kirby"
 
 
 
 
 
 def enter():
-    global bgm,hero,mob,map,notes,sound,Noteimg,total_time,notes,bgm_isplay
-    open_canvas(sync=True)
+    global bgm,map,notes,sound,Noteimg,total_time,bgm_isplay
+    open_canvas(w=600,h=350,sync=True)
 
     bgm_isplay = False
-    bgm = load_music('../bgm/necro.mp3')
-    bgm.set_volume(64)
+    bgm = load_music('../bgm/kirby_bgm.mp3')
+    bgm.set_volume(96)
     notes = []
     total_time = 0.0
 
@@ -26,25 +27,26 @@ def enter():
     note_create()
     #a = note()
 
+    map = Scrollmap()
+
 
     sound = load_wav('../bgm/overwatch_kill.wav')
     sound.set_volume(64)
 
-    map = load_image('necrodancer_map.png')
 
-    hero = Hero()
 
-    mob = skeleton()
+
 
 
 def exit():
-    global map,mob,hero,Noteimg,notes,timer
+    global timer,bgm,sound,map
     timer.cancel()
-    del(Noteimg)
+    bgm.stop()
+    del(bgm)
+    del(sound)
     del(map)
-    del(hero)
-    del(mob)
-    del(notes)
+
+
     close_canvas()
 
 
@@ -57,7 +59,8 @@ def handle_events(frame_time):
             game_framework.quit()
         else:
             if (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
-                game_framework.change_state(select_state)
+                game_result.savescore(1, 55)
+                game_framework.change_state(game_result)
             elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
                 for note in notes:
                     note.handle_event()
@@ -68,62 +71,46 @@ def update(frame_time):
         bgm.play()
         bgm_isplay = True
 
+    map.update(frame_time)
 
     for nots in notes:
         nots.update(frame_time)
 
-    mob.update(frame_time)
-    hero.update(frame_time)
+
 
 
 
 def draw(frame_time):
-    global total_time,mob,map,hero,notes
+    global total_time,notes
     clear_canvas()
 
-    map.draw(400, 300)
-
-    for nots in notes:
-        nots.draw(frame_time)
+    map.draw(frame_time)
 
 
-    hero.draw(frame_time)
 
 
-    mob.draw(frame_time)
+
 
     update_canvas()
+
     total_time+=frame_time
 
-class skeleton:
-    TIME_PER_ACTION = 1
-    ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
-    FRAMES_PER_ACTION = 8
-    def __init__(self):
-        self.image = load_image('스켈레톤.png')
-        self.frame = 0
-        self.total_frames = 0
-    def update(self,frame_time):
-        global notes
-        self.total_frames += skeleton.FRAMES_PER_ACTION * skeleton.ACTION_PER_TIME * frame_time
-        self.frame = int(self.total_frames) % 15
-    def draw(self,frame_time):
-        self.image.clip_draw(self.frame * 96 ,0,100,100,500,300)
 
-class Hero:
-    TIME_PER_ACTION = 1
-    ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
-    FRAMES_PER_ACTION = 8
+
+class Scrollmap:
+    PIXEL_PER_SECOND = 80
     def __init__(self):
-        self.image = load_image('necrodancer_sprite.png')
-        self.frame = 0
-        self.total_frames = 0
-    def update(self,frame_time):
-        global notes
-        self.total_frames += Hero.FRAMES_PER_ACTION * Hero.ACTION_PER_TIME * frame_time
-        self.frame = int(self.total_frames) % 4
+        self.x = 0
+        self.image = load_image('kirby_map.png')
+
     def draw(self,frame_time):
-        self.image.clip_draw(self.frame * 100 ,0,100,100,320,300)
+        x = int(self.x)
+        w = min(self.image.w-x,600)
+        self.image.clip_draw_to_origin(x, 350, w, 350, 0, 0)
+        self.image.clip_draw_to_origin(0, 350, 600-w, 350, w, 0)
+
+    def update(self,frame_time):
+        self.x = self.x + frame_time * self.PIXEL_PER_SECOND % self.image.w
 
 class note:
     def __init__(self):
