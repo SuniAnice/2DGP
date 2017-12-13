@@ -23,6 +23,7 @@ def enter():
     rotate_sound = load_wav('../bgm/rotate.wav')
     rotate_sound.set_volume(48)
     font = load_font('HUSimple.ttf', 50)
+
 def exit():
     global default,left_arrow,right_arrow,Screen,bgm
     bgm.stop()
@@ -32,6 +33,7 @@ def exit():
     del(left_arrow)
     del(right_arrow)
     close_canvas()
+
 def handle_events(frame_time):
     global select,rotate_sound
     events = get_events()
@@ -58,9 +60,11 @@ def handle_events(frame_time):
                 
             elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
                 Screen.handle_event()
+
 def update(frame_time):
     left_arrow.update()
     right_arrow.update()
+
 def draw(frame_time):
     global select
     clear_canvas()
@@ -73,18 +77,19 @@ def draw(frame_time):
 
     left_arrow.draw()
     right_arrow.draw()
-        
-    
+
     update_canvas()
 
 class gamescreen:
     def __init__(self):
+
         self.screen = []
         self.screen.append(load_image('necrodancer.png'))
         self.screen.append(load_image('Kirby Select Scene.png'))
         self.screen.append(load_image('rhythm_icon.png'))
         self.screen.append(load_image('Mario Select Scene.png'))
         self.screen.append(load_image('Overwatch Select Scene.png'))
+
         self.title = []
         self.title.append(load_image('tutorial-3d-logo.png'))
         self.title.append(load_image('Kirbys_Adventure_Logo.png'))
@@ -96,8 +101,6 @@ class gamescreen:
         f = open("../source/highscore.json","r")
         self.score = json.load(f)
         f.close()
-
-
 
 
     def draw(self):
@@ -116,8 +119,9 @@ class gamescreen:
             string = str(self.score["game3"]) + "점"
         elif select == 4:
             string = str(self.score["game4"]) + "점"
+
         if select !=0:
-            font.draw(500,55,string,(255,0,0))
+            font.draw(440,50,string,(255,0,0))
 
 
 

@@ -6,23 +6,23 @@ import select_state
 import game_result
 import json
 os.chdir('../image')
-name = "Kirby"
+name = "Rhythm"
 
 
 
 
 def enter():
-    global bgm,map,notes,sound,Noteimg,total_time,bgm_isplay,notedata,notecount,score
+    global bgm,map,notes,sound,Noteimg,total_time,bgm_isplay,notedata,notecount
 
 
-    open_canvas(w=600,h=350,sync=True)
+    open_canvas(sync=True)
 
-    score = 0
 
     notecount = 0
     bgm_isplay = False
     bgm = load_music('../bgm/kirby_bgm.mp3')
     bgm.set_volume(96)
+
     notes = []
     total_time = 0.0
 
@@ -49,13 +49,12 @@ def enter():
 
 
 def exit():
-    global timer,bgm,sound,map,notes
+    global timer,bgm,sound,map
     timer.cancel()
     bgm.stop()
     del(bgm)
     del(sound)
     del(map)
-    del(notes)
 
 
     close_canvas()
@@ -136,7 +135,7 @@ class note:
 
     def handle_event(self):
         global notes
-        if self.x >375 and self.x<425 :
+        if self.x >350 and self.x<450:
             sound.play()
             notes.remove(self)
 
@@ -144,9 +143,8 @@ def note_create():
     global notes,timer,notecount,notedata
     timer = threading.Timer(notedata["data"][notecount],note_create)
 
-    if (notecount != 0):
-        a = note()
-        notes.append(a)
+    a = note()
+    notes.append(a)
 
     notecount+=1
 
