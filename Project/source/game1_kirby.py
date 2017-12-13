@@ -59,7 +59,7 @@ def handle_events(frame_time):
             game_framework.quit()
         else:
             if (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
-                game_result.savescore(1, 55)
+                game_result.savescore(1, 95)
                 game_framework.change_state(game_result)
             elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
                 for note in notes:

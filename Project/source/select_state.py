@@ -4,11 +4,12 @@ import title_state
 import game0_tutorial
 import game1_kirby
 import os
+import json
 os.chdir('../image')
 name = "SelectState"
 bgm = None
 def enter():
-    global default,left_arrow,right_arrow,select,rotate_sound,bgm,Screen,high
+    global default,left_arrow,right_arrow,select,rotate_sound,bgm,Screen,high,font
     open_canvas(sync = True)
     select = 0
     Screen = gamescreen()
@@ -21,6 +22,7 @@ def enter():
     bgm.repeat_play()
     rotate_sound = load_wav('../bgm/rotate.wav')
     rotate_sound.set_volume(48)
+    font = load_font('HUSimple.ttf', 50)
 def exit():
     global default,left_arrow,right_arrow,Screen,bgm
     bgm.stop()
@@ -80,21 +82,45 @@ class gamescreen:
         self.screen = []
         self.screen.append(load_image('necrodancer.png'))
         self.screen.append(load_image('Kirby Select Scene.png'))
+        self.screen.append(load_image('rhythm_icon.png'))
         self.screen.append(load_image('Mario Select Scene.png'))
         self.screen.append(load_image('Overwatch Select Scene.png'))
-        self.screen.append(load_image('rhythm_icon.png'))
         self.title = []
         self.title.append(load_image('tutorial-3d-logo.png'))
         self.title.append(load_image('Kirbys_Adventure_Logo.png'))
+        self.title.append(load_image('rhythmtitle.png'))
         self.title.append(load_image('mariotitle.png'))
         self.title.append(load_image('game-logo-overwatch.png'))
-        self.title.append(load_image('rhythmtitle.png'))
+
+        self.score = []
+        f = open("../source/highscore.json","r")
+        self.score = json.load(f)
+        f.close()
+
+
+
+
     def draw(self):
         global select
         image = self.screen[select]
         image2 = self.title[select]
         image.draw(400,300)
         image2.draw(400,500)
+
+
+        if select == 1:
+            string = str(self.score["game1"]) + "점"
+        elif select == 2:
+            string = str(self.score["game2"]) + "점"
+        elif select == 3:
+            string = str(self.score["game3"]) + "점"
+        elif select == 4:
+            string = str(self.score["game4"]) + "점"
+        if select !=0:
+            font.draw(500,55,string,(255,0,0))
+
+
+
     def handle_event(self):
         global select
         if select == 0:
