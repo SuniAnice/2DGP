@@ -143,6 +143,7 @@ class note:
         if self.x < 50:
             del notes[0]
             score-=1
+            hero.effecton()
         self.total_frame += Kirby.FRAMES_PER_ACTION * Kirby.ACTION_PER_TIME * frame_time
         self.frame = int(self.total_frame) % 7
 
@@ -206,6 +207,12 @@ class Kirby:
         self.y = 200
         self.image = load_image('wing_kirby.png')
 
+        self.effect = load_image('Effect_sprite.png')
+
+        self.effectflag = False
+        self.efframe = 0
+        self.total_efframe = 0
+
         self.frame = 0
         self.total_frames = 0
 
@@ -218,6 +225,9 @@ class Kirby:
             self.image.clip_draw(37+self.frame*75,195,75,91, self.x,self.y)
         else:
             self.image.clip_draw(80 + self.attframe * 75, 20, 75, 91, self.x, self.y)
+
+        if self.effectflag == True:
+            self.effect.clip_draw(75*self.frame,0,75,75,self.x,self.y)
     def update(self,frame_time):
         self.total_frames += Kirby.FRAMES_PER_ACTION * Kirby.ACTION_PER_TIME * frame_time
         self.frame = int(self.total_frames) % 6
@@ -228,10 +238,21 @@ class Kirby:
             if self.attframe == 3:
                 self.attacking = False
 
+        if self.effectflag == True:
+            self.total_efframe += judgenote.FRAMES_PER_ACTION * judgenote.ACTION_PER_TIME * frame_time
+            self.efframe = int(self.total_efframe) % 9
+            if (self.efframe == 8):
+                self.effectflag = False
+
     def handle_events(self,frame_time):
         self.attacking = True
         self.attframe = 0
         self.attotalframe = 0
+
+    def effecton(self):
+        self.effectflag = True
+        self.efframe = 0
+        self.total_efframe = 0
 
 
 
