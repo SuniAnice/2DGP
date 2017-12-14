@@ -12,12 +12,11 @@ name = "Kirby"
 
 
 def enter():
-    global bgm,map,notes,sound,Noteimg,total_time,bgm_isplay,notedata,notecount,score
-
+    global bgm,map,notes,sound,Noteimg,total_time,bgm_isplay,notedata,notecount,score,hero,targetimg
 
     open_canvas(w=600,h=350,sync=True)
 
-    score = 0
+    score = 100
 
     notecount = 0
     bgm_isplay = False
@@ -30,9 +29,11 @@ def enter():
     notedata = json.load(f)
     f.close()
 
+    hero = Kirby()
 
 
     Noteimg = load_image('note.png')
+    targetimg = load_image('target.png')
 
 
     note_create()
@@ -42,9 +43,6 @@ def enter():
 
     sound = load_wav('../bgm/overwatch_kill.wav')
     sound.set_volume(64)
-
-
-
 
 
 
@@ -75,6 +73,7 @@ def handle_events(frame_time):
             elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
                 for note in notes:
                     note.handle_event()
+                hero.handle_events(frame_time)
 
 def update(frame_time):
     global bgm,bgm_isplay,notes
@@ -83,6 +82,8 @@ def update(frame_time):
         bgm_isplay = True
 
     map.update(frame_time)
+
+    hero.update(frame_time)
 
     for nots in notes:
         nots.update(frame_time)
@@ -99,6 +100,10 @@ def draw(frame_time):
 
     for note in notes:
         note.draw(frame_time)
+
+    hero.draw(frame_time)
+
+    targetimg.draw(400,100)
 
     update_canvas()
 
@@ -119,20 +124,22 @@ class Scrollmap:
         self.image.clip_draw_to_origin(0, 350, 600-w, 350, w, 0)
 
     def update(self,frame_time):
-        self.x = self.x + frame_time * self.PIXEL_PER_SECOND % self.image.w
+        self.x = (self.x + frame_time * self.PIXEL_PER_SECOND) % self.image.w
 
 class note:
     def __init__(self):
         self.x = 800.0
 
     def update(self,frame_time):
+        global score
         self.x -=3.33
         if self.x < 0:
             del notes[0]
+            score-=1
 
     def draw(self,frame_time):
         global Noteimg
-        Noteimg.draw(self.x,200)
+        Noteimg.draw(self.x,100)
 
     def handle_event(self):
         global notes
@@ -151,6 +158,43 @@ def note_create():
     notecount+=1
 
     timer.start()
+
+class Kirby:
+    TIME_PER_ACTION = 1
+    ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+    FRAMES_PER_ACTION = 8
+    def __init__(self):
+        self.x = 50
+        self.y = 250
+        self.image = load_image('wing_kirby.png')
+
+        self.frame = 0
+        self.total_frames = 0
+
+        self.attacking = False
+        self.attframe = 0
+        self.attotalframe = 0
+
+    def draw(self,frame_time):
+        if self.attacking == False:
+            self.image.clip_draw(37+self.frame*75,195,75,91, self.x,self.y)
+        else:
+            self.image.clip_draw(80 + self.attframe * 75, 20, 75, 91, self.x, self.y)
+    def update(self,frame_time):
+        self.total_frames += Kirby.FRAMES_PER_ACTION * Kirby.ACTION_PER_TIME * frame_time
+        self.frame = int(self.total_frames) % 6
+
+        if self.attacking ==True:
+            self.attotalframe += Kirby.FRAMES_PER_ACTION * Kirby.ACTION_PER_TIME * frame_time
+            self.attframe = int(self.attotalframe) % 4
+            if self.attframe == 3:
+                self.attacking = False
+
+    def handle_events(self,frame_time):
+        self.attacking = True
+        self.attframe = 0
+        self.attotalframe = 0
+
 
 
 

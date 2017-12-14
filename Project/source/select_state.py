@@ -82,7 +82,6 @@ def draw(frame_time):
 
 class gamescreen:
     def __init__(self):
-
         self.screen = []
         self.screen.append(load_image('necrodancer.png'))
         self.screen.append(load_image('Kirby Select Scene.png'))
