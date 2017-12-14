@@ -41,7 +41,7 @@ def enter():
     map = Scrollmap()
 
 
-    sound = load_wav('../bgm/overwatch_kill.wav')
+    sound = load_wav('../bgm/맞는소리.wav')
     sound.set_volume(64)
 
 
@@ -77,7 +77,7 @@ def handle_events(frame_time):
 
 def update(frame_time):
     global bgm,bgm_isplay,notes
-    if total_time > 4.0 and bgm_isplay == False:
+    if total_time > 2.0 and bgm_isplay == False:
         bgm.play()
         bgm_isplay = True
 
@@ -103,7 +103,7 @@ def draw(frame_time):
 
     hero.draw(frame_time)
 
-    targetimg.draw(400,100)
+    targetimg.draw(200,100)
 
     update_canvas()
 
@@ -127,12 +127,13 @@ class Scrollmap:
         self.x = (self.x + frame_time * self.PIXEL_PER_SECOND) % self.image.w
 
 class note:
+    SPEED_PER_SECOND = 300
     def __init__(self):
-        self.x = 800.0
+        self.x = 6 00.0
 
     def update(self,frame_time):
         global score
-        self.x -=3.33
+        self.x -= note.SPEED_PER_SECOND * frame_time
         if self.x < 0:
             del notes[0]
             score-=1
@@ -143,7 +144,7 @@ class note:
 
     def handle_event(self):
         global notes
-        if self.x >375 and self.x<425 :
+        if self.x >175 and self.x<225 :
             sound.play()
             notes.remove(self)
 
