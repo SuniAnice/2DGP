@@ -35,7 +35,6 @@ def enter():
 
     target = judgenote()
 
-
     note_create()
 
     map = Scrollmap()
@@ -131,7 +130,7 @@ class Scrollmap:
         self.x = (self.x + frame_time * self.PIXEL_PER_SECOND) % self.image.w
 
 class note:
-    SPEED_PER_SECOND = 300
+    SPEED_PER_SECOND = 200
     def __init__(self):
         self.x = 600.0
         self.frame = 0
