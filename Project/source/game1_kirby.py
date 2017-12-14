@@ -12,7 +12,7 @@ name = "Kirby"
 
 
 def enter():
-    global bgm,map,notes,sound,Noteimg,total_time,bgm_isplay,notedata,notecount,score,hero,targetimg
+    global bgm,map,notes,sound,Noteimg,total_time,bgm_isplay,notedata,notecount,score,hero,target
 
     open_canvas(w=600,h=350,sync=True)
 
@@ -31,9 +31,9 @@ def enter():
 
     hero = Kirby()
 
+    Noteimg = load_image('enemy_sprtie.png')
 
-    Noteimg = load_image('note.png')
-    targetimg = load_image('target.png')
+    target = judgenote()
 
 
     note_create()
@@ -83,6 +83,8 @@ def update(frame_time):
 
     map.update(frame_time)
 
+    target.update(frame_time)
+
     hero.update(frame_time)
 
     for nots in notes:
@@ -105,7 +107,7 @@ def draw(frame_time):
 
     hero.draw(frame_time)
 
-    targetimg.draw(200,100)
+    target.draw(frame_time)
 
     update_canvas()
 
@@ -114,7 +116,7 @@ def draw(frame_time):
 
 
 class Scrollmap:
-    PIXEL_PER_SECOND = 80
+    PIXEL_PER_SECOND = 120
     def __init__(self):
         self.x = 0
         self.image = load_image('kirby_map.png')
@@ -132,6 +134,8 @@ class note:
     SPEED_PER_SECOND = 300
     def __init__(self):
         self.x = 600.0
+        self.frame = 0
+        self.total_frame = 0
 
     def update(self,frame_time):
         global score
@@ -139,16 +143,19 @@ class note:
         if self.x < 50:
             del notes[0]
             score-=1
+        self.total_frame += Kirby.FRAMES_PER_ACTION * Kirby.ACTION_PER_TIME * frame_time
+        self.frame = int(self.total_frame) % 7
 
     def draw(self,frame_time):
         global Noteimg
-        Noteimg.draw(self.x,100)
+        Noteimg.clip_draw(self.frame*100,0,100,100,self.x,200)
 
     def handle_event(self):
-        global notes
-        if self.x >175 and self.x<225 :
+        global notes,target
+        if self.x >170 and self.x<230 :
             sound.play()
             notes.remove(self)
+            target.effecton()
 
 def note_create():
     global notes,timer,notecount,notedata
@@ -162,13 +169,40 @@ def note_create():
 
     timer.start()
 
+
+class judgenote:
+    TIME_PER_ACTION = 1
+    ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+    FRAMES_PER_ACTION = 12
+    def __init__(self):
+        self.x = 200
+        self.y = 200
+        self.image = load_image('target.png')
+        self.effect = load_image('Effect_sprite.png')
+        self.effectflag = False
+        self.frame = 0
+        self.total_frame = 0
+    def draw(self,frame_time):
+        self.image.draw(self.x,self.y)
+        if self.effectflag == True:
+            self.effect.clip_draw(75*self.frame,0,75,75,self.x,self.y)
+    def update(self,frame_time):
+        self.total_frame += judgenote.FRAMES_PER_ACTION * judgenote.ACTION_PER_TIME * frame_time
+        self.frame = int(self.total_frame) % 9
+        if (self.frame == 8):
+            self.effectflag = False
+    def effecton(self):
+        self.effectflag = True
+        self.frame = 0
+        self.total_frame = 0
+
 class Kirby:
     TIME_PER_ACTION = 1
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
     FRAMES_PER_ACTION = 8
     def __init__(self):
         self.x = 50
-        self.y = 250
+        self.y = 200
         self.image = load_image('wing_kirby.png')
 
         self.frame = 0
