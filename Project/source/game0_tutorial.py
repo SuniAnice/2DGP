@@ -11,7 +11,7 @@ name = "Tutorial"
 
 
 def enter():
-    global bgm,hero,mob,map,notes,sound,Noteimg,total_time,notes,bgm_isplay
+    global bgm,hero,mob,map,notes,sound,Noteimg,total_time,notes,bgm_isplay,target
     open_canvas(sync=True)
 
     bgm_isplay = False
@@ -22,9 +22,9 @@ def enter():
 
     Noteimg = load_image('note.png')
 
+    target = judgenote()
 
     note_create()
-    #a = note()
 
 
     sound = load_wav('../bgm/overwatch_kill.wav')
@@ -68,6 +68,8 @@ def update(frame_time):
         bgm.play()
         bgm_isplay = True
 
+    target.update(frame_time)
+
 
     for nots in notes:
         nots.update(frame_time)
@@ -82,6 +84,8 @@ def draw(frame_time):
     clear_canvas()
 
     map.draw(400, 300)
+
+    target.draw(frame_time)
 
     for nots in notes:
         nots.draw(frame_time)
@@ -108,7 +112,7 @@ class skeleton:
         self.total_frames += skeleton.FRAMES_PER_ACTION * skeleton.ACTION_PER_TIME * frame_time
         self.frame = int(self.total_frames) % 15
     def draw(self,frame_time):
-        self.image.clip_draw(self.frame * 96 ,0,100,100,500,300)
+        self.image.clip_draw(self.frame * 97 ,0,100,100,500,300)
 
 class Hero:
     TIME_PER_ACTION = 1
@@ -123,7 +127,7 @@ class Hero:
         self.total_frames += Hero.FRAMES_PER_ACTION * Hero.ACTION_PER_TIME * frame_time
         self.frame = int(self.total_frames) % 4
     def draw(self,frame_time):
-        self.image.clip_draw(self.frame * 100 ,0,100,100,320,300)
+        self.image.clip_draw(self.frame * 105 ,0,100,100,320,300)
 
 class note:
     def __init__(self):
@@ -143,6 +147,7 @@ class note:
         if self.x >350 and self.x<450:
             sound.play()
             notes.remove(self)
+            target.effecton()
 
 def note_create():
     global notes,timer
@@ -154,5 +159,28 @@ def note_create():
     timer.start()
 
 
-class judge:
-    pass
+class judgenote:
+    TIME_PER_ACTION = 1
+    ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+    FRAMES_PER_ACTION = 12
+    def __init__(self):
+        self.x = 400
+        self.y = 500
+        self.image = load_image('target.png')
+        self.effect = load_image('Effect_sprite.png')
+        self.effectflag = False
+        self.frame = 0
+        self.total_frame = 0
+    def draw(self,frame_time):
+        self.image.draw(self.x,self.y)
+        if self.effectflag == True:
+            self.effect.clip_draw(75*self.frame,0,75,75,self.x,self.y)
+    def update(self,frame_time):
+        self.total_frame += judgenote.FRAMES_PER_ACTION * judgenote.ACTION_PER_TIME * frame_time
+        self.frame = int(self.total_frame) % 9
+        if (self.frame == 8):
+            self.effectflag = False
+    def effecton(self):
+        self.effectflag = True
+        self.frame = 0
+        self.total_frame = 0

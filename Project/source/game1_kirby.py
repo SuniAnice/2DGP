@@ -161,11 +161,12 @@ def note_create():
     global notes,timer,notecount,notedata
     timer = threading.Timer(notedata["data"][notecount],note_create)
 
-    if (notecount != 0):
+    if (notecount != 0 and notecount<=227):
         a = note()
         notes.append(a)
 
     notecount+=1
+
 
     timer.start()
 
