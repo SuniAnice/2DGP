@@ -79,7 +79,7 @@ def handle_events(frame_time):
 
 def update(frame_time):
     global bgm,bgm_isplay,notes
-    if total_time > 2.0 and bgm_isplay == False:
+    if total_time > 3.5 and bgm_isplay == False:
         bgm.play()
         bgm_isplay = True
 
