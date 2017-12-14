@@ -60,6 +60,20 @@ def handle_events(frame_time):
                 
             elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
                 Screen.handle_event()
+            elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_x):
+                score = []
+                f = open("../source/highscore.json", "r")
+                score = json.load(f)
+                f.close()
+                f = open("../source/highscore.json", "w")
+                score["game1"] = 0
+                score["game2"] = 0
+                score["game3"] = 0
+                score["game4"] = 0
+                json.dump(score,f)
+                f.close()
+
+
 
 def update(frame_time):
     left_arrow.update()

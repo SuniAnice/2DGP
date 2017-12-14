@@ -61,14 +61,14 @@ def exit():
 
 
 def handle_events(frame_time):
-    global total_time
+    global total_time,score
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
             game_framework.quit()
         else:
             if (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
-                game_result.savescore(1, 95)
+                game_result.savescore(1, score)
                 game_framework.change_state(game_result)
             elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
                 for note in notes:
@@ -88,7 +88,9 @@ def update(frame_time):
     for nots in notes:
         nots.update(frame_time)
 
-
+    if total_time > 134.0:
+        game_result.savescore(1, score)
+        game_framework.change_state(game_result)
 
 
 
@@ -134,7 +136,7 @@ class note:
     def update(self,frame_time):
         global score
         self.x -= note.SPEED_PER_SECOND * frame_time
-        if self.x < 0:
+        if self.x < 50:
             del notes[0]
             score-=1
 
