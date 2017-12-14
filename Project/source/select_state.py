@@ -3,6 +3,7 @@ import game_framework
 import title_state
 import game0_tutorial
 import game1_kirby
+import game2_rhythm
 import os
 import json
 os.chdir('../image')
@@ -144,6 +145,8 @@ class gamescreen:
             game_framework.change_state(game0_tutorial)
         elif select == 1:
             game_framework.change_state(game1_kirby)
+        elif select == 2:
+            game_framework.change_state(game2_rhythm)
 
 class LArrow:
     def __init__(self):

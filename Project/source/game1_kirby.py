@@ -25,7 +25,7 @@ def enter():
     notes = []
     total_time = 0.0
 
-    f = open("../source/kirby.json", "r")
+    f = open("../source/Kirby.json", "r")
     notedata = json.load(f)
     f.close()
 
@@ -67,7 +67,7 @@ def handle_events(frame_time):
             game_framework.quit()
         else:
             if (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
-                game_result.savescore(1, score)
+                game_result.savescore(1, clamp(0,score,100))
                 game_framework.change_state(game_result)
             elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
                 for note in notes:
@@ -90,7 +90,7 @@ def update(frame_time):
         nots.update(frame_time)
 
     if total_time > 134.0:
-        game_result.savescore(1, score)
+        game_result.savescore(1, clamp(0,score,100))
         game_framework.change_state(game_result)
 
 
@@ -104,9 +104,11 @@ def draw(frame_time):
     for note in notes:
         note.draw(frame_time)
 
-    hero.draw(frame_time)
+
 
     target.draw(frame_time)
+
+    hero.draw(frame_time)
 
     update_canvas()
 
@@ -139,7 +141,7 @@ class note:
     def update(self,frame_time):
         global score
         self.x -= note.SPEED_PER_SECOND * frame_time
-        if self.x < 50:
+        if self.x < 130:
             del notes[0]
             score-=1
             hero.effecton()
@@ -159,16 +161,16 @@ class note:
 
 def note_create():
     global notes,timer,notecount,notedata
-    timer = threading.Timer(notedata["data"][notecount],note_create)
+    if (notecount<=len(notedata["data"])-1):
 
-    if (notecount != 0 and notecount<=227):
-        a = note()
-        notes.append(a)
+        timer = threading.Timer(notedata["data"][notecount],note_create)
 
-    notecount+=1
+        if (notecount != 0):
+            a = note()
+            notes.append(a)
 
-
-    timer.start()
+        notecount+=1
+        timer.start()
 
 
 class judgenote:
@@ -202,9 +204,13 @@ class Kirby:
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
     FRAMES_PER_ACTION = 8
     def __init__(self):
-        self.x = 50
+        self.x = 130
         self.y = 200
         self.image = load_image('wing_kirby.png')
+
+        self.atteffect = load_image('attack_motion.png')
+
+
 
         self.effect = load_image('Effect_sprite.png')
 
@@ -224,9 +230,11 @@ class Kirby:
             self.image.clip_draw(37+self.frame*75,195,75,91, self.x,self.y)
         else:
             self.image.clip_draw(80 + self.attframe * 75, 20, 75, 91, self.x, self.y)
+            self.atteffect.clip_draw(75 * (self.attframe-1),0,75,91,target.x,self.y)
 
         if self.effectflag == True:
             self.effect.clip_draw(75*self.frame,0,75,75,self.x,self.y)
+
     def update(self,frame_time):
         self.total_frames += Kirby.FRAMES_PER_ACTION * Kirby.ACTION_PER_TIME * frame_time
         self.frame = int(self.total_frames) % 6
