@@ -129,7 +129,7 @@ class Scrollmap:
 class note:
     SPEED_PER_SECOND = 300
     def __init__(self):
-        self.x = 6 00.0
+        self.x = 600.0
 
     def update(self,frame_time):
         global score
