@@ -12,7 +12,7 @@ name = "Kirby"
 
 
 def enter():
-    global bgm,map,notes,sound,Noteimg,total_time,bgm_isplay,notedata,notecount,score,hero,target
+    global bgm,map,notes,sound,Noteimg,total_time,bgm_isplay,notedata,notecount,score,hero,target,hitsound
 
     open_canvas(w=600,h=350,sync=True)
 
@@ -38,6 +38,9 @@ def enter():
     note_create()
 
     map = Scrollmap()
+
+    hitsound = load_wav('../bgm/hit.wav')
+    hitsound.set_volume(64)
 
 
     sound = load_wav('../bgm/맞는소리.wav')
@@ -145,6 +148,7 @@ class note:
             del notes[0]
             score-=1
             hero.effecton()
+            hitsound.play()
         self.total_frame += Kirby.FRAMES_PER_ACTION * Kirby.ACTION_PER_TIME * frame_time
         self.frame = int(self.total_frame) % 7
 

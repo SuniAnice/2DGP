@@ -4,6 +4,7 @@ import os
 import threading
 import select_state
 import game_result
+import random
 import json
 os.chdir('../image')
 name = "Rhythm"
@@ -12,9 +13,9 @@ name = "Rhythm"
 
 
 def enter():
-    global bgm,map,notes,sound,Noteimg,total_time,bgm_isplay,notedata,notecount,score,target,hero
+    global bgm,map,notes,sound,Noteimg,total_time,bgm_isplay,notedata,notecount,score,target,hero,hitsound
 
-    open_canvas(sync=True)
+    open_canvas(w=600,h=400,sync=True)
 
     score = 100
 
@@ -25,13 +26,13 @@ def enter():
     notes = []
     total_time = 0.0
 
-    f = open("../source/Kirby.json", "r")
+    f = open("../source/rhythm.json", "r")
     notedata = json.load(f)
     f.close()
 
     hero = Fighter()
 
-    Noteimg = load_image('target.png')
+    Noteimg = load_image('note.png')
 
     target = judgenote()
 
@@ -42,6 +43,9 @@ def enter():
 
     sound = load_wav('../bgm/맞는소리.wav')
     sound.set_volume(64)
+
+    hitsound = load_wav('../bgm/Dead_01.wav')
+    hitsound.set_volume(64)
 
 
 
@@ -72,6 +76,7 @@ def handle_events(frame_time):
             elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
                 for note in notes:
                     note.handle_event()
+                hero.handle_event()
 
 
 def update(frame_time):
@@ -90,7 +95,7 @@ def update(frame_time):
     for nots in notes:
         nots.update(frame_time)
 
-    if total_time > 134.0:
+    if total_time > 45.0:
         game_result.savescore(2, clamp(0,score,100))
         game_framework.change_state(game_result)
 
@@ -106,9 +111,11 @@ def draw(frame_time):
         note.draw(frame_time)
 
 
-    hero.draw(frame_time)
+
 
     target.draw(frame_time)
+
+    hero.draw(frame_time)
 
 
 
@@ -137,39 +144,64 @@ class note:
     SPEED_PER_SECOND = 200
     def __init__(self):
         self.x = 600.0
+        self.y = 120
         self.frame = 0
+        self.xspeed = 200
+        self.yspeed = 0
 
     def update(self,frame_time):
         global score
-        self.x -= note.SPEED_PER_SECOND * frame_time
-        if self.x < 130:
+        self.x -= self.xspeed * frame_time
+        self.y -= self  .yspeed * frame_time
+        if self.x < 200:
             del notes[0]
-            score-=1
+            score-=3
+            hitsound.play()
+        elif self.x > 600:
+            del notes[0]
 
 
     def draw(self,frame_time):
         global Noteimg
-        Noteimg.draw(self.x,250)
+        Noteimg.draw(self.x,self.y)
 
     def handle_event(self):
         global notes,target
-        if self.x >170 and self.x<230 :
+        if self.x >270 and self.x<330 :
             sound.play()
-            notes.remove(self)
             target.effecton()
+            self.xspeed = random.randint(-800,-700)
+            self.yspeed = random.randint(-100, 100)
 
 class Fighter:
+    TIME_PER_ACTION = 1
+    ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+    FRAMES_PER_ACTION = 12
     def __init__(self):
-        self.x = 100
-        self.y = 50
+        self.x = 200
+        self.y = 100
         self.frame = 0
-        self.image = load_image('rhythm_sprite.png')
+        self.image = load_image('rhythm_sprite2.png')
+        self.attflag = False
+        self.total_frame = 0
 
     def draw(self,frame_time):
-        self.image.clip_draw(450,0,150,150,self.x,self.y)
+        if (self.attflag == False):
+            self.image.clip_draw(900,0,300,300,self.x,self.y)
+        else:
+            self.image.clip_draw(300*self.frame, 0, 300, 300, self.x, self.y)
 
     def update(self,frame_time):
-        pass
+        if self.attflag == True:
+            self.total_frame += Fighter.FRAMES_PER_ACTION * Fighter.ACTION_PER_TIME * frame_time
+            self.frame = int(self.total_frame) % 4
+            if self.frame == 3:
+                self.attflag = False
+
+    def handle_event(self):
+        self.attflag = True
+        self.frame = 0
+        self.total_frame = 0
 
 
 def note_create():
@@ -191,8 +223,8 @@ class judgenote:
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
     FRAMES_PER_ACTION = 12
     def __init__(self):
-        self.x = 200
-        self.y = 200
+        self.x = 300
+        self.y = 120
         self.image = load_image('target.png')
         self.effect = load_image('Effect_sprite.png')
         self.effectflag = False

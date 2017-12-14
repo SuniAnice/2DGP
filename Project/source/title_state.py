@@ -13,7 +13,7 @@ def enter():
     image2 = load_image('title_text.png')
     bgm = load_music('../bgm/title.mp3')
     bgm.set_volume(64)
-    bgm.repeat_play()
+    bgm.play()
 def exit():
     global image,image2,bgm
     bgm.stop()
